@@ -1,114 +1,100 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 
+const double delta = 1E-6;
 struct answers{
     double root1;
     double root2;
     int k;
 };
-/*int Equation1( double a, double b, double c )
+
+
+int Comparison_of_double(double d1, double d2)
 {
-    double disk = 0, root1 = 0, root2 = 0;
-    if (a == 0)
-    {
-        if (b == 0)
-            if (c == 0)
-            {
-                printf("Inf of roots\n");
-                return 0;
-            }
-        root1=root2=-c/b;
-        printf("One root of lineal is %lf\n", root1);
-        return 0;
-    }
-    disk = b*b - 4*a*c;
-    if (disk < 0)
-    {
-        printf("No roots\n");
-        return 0;
-    }    
-    if (disk == 0)
-    {
-        root1 = root2 = -b/(2*a);
-        printf("One root is %lf\n", root1);
-        return 0;
-    }
-    disk = sqrt(disk);
-    root1 = (-b + disk)/(2*a);
-    root2 = (-b - disk)/(2*a);
-    printf("Two roots: %lf and %lf\n", root1, root2);
-    return 0;
+    if ( -delta < (d1 - d2) && (d1 - d2) < delta )
+        return 1;
+    return 0;    
 }
 
-
-int main1()
+double Solution_of_a_lineal_equation(double b, double c)
 {
-    double a = 0, b = 0, c = 0;
-    
-    return (printf("Put numbers and nothig more!(Everything that you enter after these numbers does not interest the program!)\n") && ((scanf("%lf %lf %lf", &a, &b, &c) != 3 || Equation1
-    (a, b,c)) && printf("Uncorrect\n")));
-    
-}*/
+    return -c/b;
+}
 
-answers Equation2( double a, double b, double c )
+answers Solution_of_a_quadratic_equation( double a, double b, double c )
 {
-    double disk = 0;
+    double D = 0;
     answers roots;
-    roots.root1 = roots.root2 = roots.k = 0;
+    roots = {NAN, NAN, 0};
     // 0 - no roots, 1 - one root, 2 - two roots, 3 - inf of roots
-    if (a == 0)
+    if (Comparison_of_double(a, 0))
     {
-        if (b == 0)
-            if (c == 0)
+        if (Comparison_of_double(b, 0))
+            if (Comparison_of_double(c, 0))
             {
                 roots.k = 3;
                 return roots;
             }
-        roots.root1=roots.root2=-c/b;
+        roots.root1=roots.root2=Solution_of_a_lineal_equation(b, c);
         roots.k = 1;
         return roots;
     }
-    disk = b*b - 4*a*c;
-    if (disk < 0)
+    D = b * b - 4 * a * c;
+    if (D < 0)
     {
         roots.k = 0;
         return roots;
     }    
-    if (disk == 0)
+    if (Comparison_of_double(D, 0))
     {
         roots.root1 = roots.root2 = -b/(2*a);
         roots.k = 1;
         return roots;
     }
-    disk = sqrt(disk);
-    roots.root1 = (-b + disk)/(2*a);
-    roots.root2 = (-b - disk)/(2*a);
+    D = sqrt(D);
+    roots.root1 = (-b + D)/(2*a);
+    roots.root2 = (-b - D)/(2*a);
     roots.k = 2;
     return roots;
 }
 
-int main()
+
+int Quadratic_equation()
 {
     double a = 0, b = 0, c = 0;
     answers ans;
     ans.k = ans.root1 = ans.root2 = 0; 
-
-    printf("Put numbers and nothig more!(Everything that you enter after these numbers does not interest the program!)\n");
+    printf("Enter the coefficients of the quadratic equation a, b, c in this order separated by spaces." 
+    "Put numbers and nothig more!"
+    "(Everything that you enter after these numbers does not interest the program!)\n");
     if (scanf("%lf %lf %lf", &a, &b, &c) != 3)
         { 
           printf("Uncorrect\n");
           return 0;
         }
-    ans = Equation2(a, b, c);
-    if ( ans.k == 0 )
+    ans = Solution_of_a_quadratic_equation(a, b, c);
+    if ( Comparison_of_double(ans.k, 0) )
         printf("No roots\n");
-    if ( ans.k == 1 )
+    if ( Comparison_of_double(ans.k, 1) )
         printf("One root is %lf\n", ans.root1);
-    if ( ans.k == 2 ) 
+    if ( Comparison_of_double(ans.k, 2) ) 
         printf("Two roots: %lf and %lf\n", ans.root1, ans.root2);   
-    if ( ans.k == 3 )  
+    if ( Comparison_of_double(ans.k, 3) )  
         printf("Inf of roots\n");      
     return 0;
 }
 
+void unit_test()
+{
+    int k = 0;
+    for(k = 0; k < 100; k++)
+        Solution_of_a_quadratic_equation(rand(), rand(), rand());    
+}
+
+int main()
+{
+    unit_test();
+    return Quadratic_equation();
+}
