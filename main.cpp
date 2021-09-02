@@ -3,76 +3,114 @@
 #include <string.h>
 #include <stdlib.h>
 
-void unit_test();
-int Input_and_solution_quadratic_equation();
+void Unit_test();
+int Quadratic_equation_IO_interface();
 
-const double delta = 1E-6;
+/** 
+    *Bias of double numbers
+*/
+const double DELTA = 1E-6; 
 
-enum NumOfRoots{
-        UNDEF = -1,
-        ZERO, 
-        ONE, 
-        TWO, 
-        INF 
-    };
+enum Num_of_roots{
+    UNDEF = 'U',
+    ZERO  = '0', 
+    ONE   = '1', 
+    TWO   = '2', 
+    INF   = 'I' 
+};
 
-enum Comparison{
-        Less, 
-        Equal, 
-        More
-    };
+enum Double_comparsion_result{
+    LESS  = 'L', 
+    EQUAL = 'E', 
+    MORE  = 'M'
+};
 
-enum Status_quadratic_equat{
-    NDEF,
-    DEF
-};    
+enum Quadratic_equation_status{
+    NDEF = 'N',
+    DEF  = 'D'
+};
 
-struct Quadratic_equ{
+/*!
+    \brief Quadratic structure.
+
+    Contains the coefficients of the equation and its status. 
+*/
+struct Quadratic_equation{
     double a;
     double b;
     double c;
-    enum Status_quadratic_equat status;
+    enum Quadratic_equation_status status;
 };
 
+/*!
+    \brief Solution structure.
 
-struct Solve{
+    Contains the roots of the equation and their number. 
+*/
+struct Solution{
     double root1;
     double root2;
-    enum NumOfRoots status;
+    enum Num_of_roots status;
 };
 
-struct Test_example{
+/*!
+    \brief Test_info structure.
+
+    Contains information about the test model: equation coefficients, correct answers and their number. 
+*/
+struct Test_info{
     double a;
     double b;
     double c;
     double root1;
     double root2;
-    enum NumOfRoots status;
+    enum Num_of_roots status;
 };
 
-const int Num_of_unit_tests = 6;
+/** 
+    *Number of input attempts
+*/
+const int NUM_INPUT = 3; 
 
+/** 
+   * Main function. No parametrs.
+*/
 int main()
 {
-    unit_test();
-    return Input_and_solution_quadratic_equation();
+    Unit_test();
+    return Quadratic_equation_IO_interface();
 }
 
-enum Comparison Comparison_of_double(double d1, double d2)
+/*! 
+    Comparing of double numbers.
+
+    \param[in] d1 first number
+    \param[in] d2 second number
+
+    \return Result of comparing of double numbers.
+*/
+enum Double_comparsion_result Comparison_of_double(const double d1, const double d2)
 {
-    if ( -delta < (d1 - d2) && (d1 - d2) < delta )
-        return Equal;
+    if ( -DELTA < (d1 - d2) && (d1 - d2) < DELTA )
+        return EQUAL;
     if ( d1 < d2 )
-        return Less;
-    return More;        
+        return LESS;
+    return MORE;        
 }
 
-Solve Solve_of_a_linear_equation(const double b, const double c)
+/*! 
+    Solving linear equation.
+
+    \param[in] b first coefficient of linear equation
+    \param[in] c second coefficient of linear equation
+
+*/
+Solution Solve_linear_equation(const double b, const double c)
 {
-    Solve roots = {NAN, NAN, UNDEF};
-    if (Comparison_of_double(b, 0) == Equal)
+    Solution roots = {NAN, NAN, UNDEF};
+    if (Comparison_of_double(b, 0) == EQUAL)
         {
-            if (Comparison_of_double(c, 0) == Equal)
+            if (Comparison_of_double(c, 0) == EQUAL)
             {
                 roots.status = INF;
                 return roots;
@@ -88,22 +126,31 @@ Solve Solve_of_a_linear_equation(const double b, const double c)
         return roots;
 }
 
-Solve Solve_of_a_quadratic_equation( const double a, const double b, const double c )
+/*! 
+    Solve of quadratic equation.
+
+    \param[in] a first coefficient of quadratic equation.
+    \param[in] b second coefficient of quadratic equation.
+    \param[in] c third coefficient of quadratic equation. 
+
+    \return roots of quadratic equation.
+*/
+Solution Solve_quadratic_equation( const double a, const double b, const double c )
 {
-    Solve roots = {NAN, NAN, UNDEF};
-    if (Comparison_of_double(a, 0) == Equal)
+    Solution roots = {NAN, NAN, UNDEF};
+    if (Comparison_of_double(a, 0) == EQUAL)
     {
-        roots = Solve_of_a_linear_equation(b, c);
+        roots = Solve_linear_equation(b, c);
         if (roots.status != UNDEF)
             return roots;
     }
     const double D = b * b - 4 * a * c;
-    if (Comparison_of_double(D, 0) == Less)
+    if (Comparison_of_double(D, 0) == LESS)
     {
         roots.status = ZERO;
         return roots;
     }    
-    if (Comparison_of_double(D, 0) == Equal)
+    if (Comparison_of_double(D, 0) == EQUAL)
     {
         roots.root1 =  -b/(2*a);
         roots.status = ONE;
@@ -123,17 +170,18 @@ void Welcome_output()
     "(Everything that you enter after these numbers does not interest the program!)\n");
 }
 
-/*void Clean_output()
+void Clean_output()
 {
-    scanf("%*s"); 
-}*/
+    while (getchar() != '\n')
+        ; 
+}
 
-Quadratic_equ Input_of_coefficients()
+Quadratic_equation Input_of_coefficients()
 {
-    Quadratic_equ QE = {NAN, NAN, NAN, NDEF};
+    Quadratic_equation QE = {NAN, NAN, NAN, NDEF};
     if ( scanf("%lf %lf %lf", &QE.a, &QE.b, &QE.c) != 3 )
         { 
-            scanf("%*s");//TODO: Clean output
+            Clean_output();
             printf("Typing error\n");
             QE.status = NDEF;
             return QE;
@@ -142,7 +190,12 @@ Quadratic_equ Input_of_coefficients()
     return QE;    
 }
 
-void Analysis_of_answer( const Solve ans )
+/*! 
+    Analysis of answer.
+
+    \param[in] ans struct of answers.
+*/
+void Analysis_of_answer( const Solution ans )
 {
     switch( ans.status )
     {
@@ -168,16 +221,16 @@ void Analysis_of_answer( const Solve ans )
     }     
 }
 
-int Input_and_solution_quadratic_equation()
+int Quadratic_equation_IO_interface()
 {
     int i = 0;
-    Quadratic_equ QE = {NAN, NAN, NAN, NDEF};
-    Solve ans = {NAN, NAN, UNDEF};
+    Quadratic_equation QE = {NAN, NAN, NAN, NDEF};
+    Solution ans = {NAN, NAN, UNDEF};
 
     Welcome_output();
     QE = Input_of_coefficients();
 
-    for (i = 0; QE.status == NDEF && i < 3; i++ )
+    for (i = 0; QE.status == NDEF && i < NUM_INPUT; i++ )
     {
         QE = Input_of_coefficients();
     }    
@@ -185,42 +238,64 @@ int Input_and_solution_quadratic_equation()
     if ( QE.status == NDEF )
         return 0;
 
-    ans = Solve_of_a_quadratic_equation(QE.a, QE.b, QE.c);
+    ans = Solve_quadratic_equation(QE.a, QE.b, QE.c);
     Analysis_of_answer(ans); 
     return 0;
 }
 
-int IsNAN (const double x)
+/*! 
+    Checking of double number.
+
+    \param[in] x double number.
+
+    \return true or false answer.
+*/
+bool Is_NAN (const double x)
 {
-    if (x != x)
-        return 1;
-    return 0;    
+    return x != x;  
 }
 
-void unit_test()
-{
-    Solve ans = {NAN, NAN, UNDEF};
-    int i = 0;
-    const Test_example test[Num_of_unit_tests] = {
-        {1, 1, 1, NAN, NAN, ZERO},
-        {1, 0, -1, 1, -1, TWO},
-        {1, 2, 1, -1, NAN, ONE},
-        {0, 0, 0, NAN, NAN, INF},
-        {0, 0, 1, NAN, NAN, ZERO},
-        {0, 2, -4, 2, NAN, ONE}
-    };
+/*! 
+    Comprassion of answers.
 
-    for ( i = 0; i < Num_of_unit_tests; i++ )
+    \param[in] root1 practical answer.
+    \param[in] root2 theoretical answer.
+
+    \return true or false answer.
+*/
+bool Comparison_of_roots( const double root1, const double root2)
+{
+    return root1 == root2 || (Is_NAN(root1) && Is_NAN(root2));       
+}
+
+void Unit_test()
+{
+    Solution ans = {NAN, NAN, UNDEF};
+    int i = 0;
+    const Test_info test[] = {
+        {1,  1,  1, NAN, NAN, ZERO },
+        {1,  0, -1,   1,  -1, TWO  },
+        {1,  2,  1,  -1, NAN, ONE  },
+        {0,  0,  0, NAN, NAN, INF  },
+        {0,  0,  1, NAN, NAN, ZERO },
+        {0,  2, -4,   2, NAN, ONE  }
+    };
+    int Num = sizeof(test)/sizeof(test[0]);
+    for ( i = 0; i < Num; i++ )
     {
         ans.root1 = ans.root2 = NAN;
-        ans = Solve_of_a_quadratic_equation(test[i].a, test[i].b, test[i].c);
+        ans = Solve_quadratic_equation(test[i].a, test[i].b, test[i].c);
 
-        printf("a = %f, b = %f, c = %f\n", test[i].a, test[i].b, test[i].c);
-        printf("Got:       x1 = %f, x2 = %f, status = %u\n", ans.root1, ans.root2, ans.status);
-        printf("Should be: x1 = %f, x2 = %f, status = %u\n", test[i].root1, test[i].root2, test[i].status);
+        printf("a = %f, b = %f, c = %f\n",
+                test[i].a, test[i].b, test[i].c);
+        printf("Got:       x1 = %f, x2 = %f, status = %u\n",
+                ans.root1, ans.root2, ans.status);
+        printf("Should be: x1 = %f, x2 = %f, status = %u\n",
+                test[i].root1, test[i].root2, test[i].status);
         
-        if ((ans.root1 == test[i].root1 || (IsNAN(ans.root1) && IsNAN(test[i].root1)) && 
-            (ans.root2 == test[i].root2 || (IsNAN(ans.root1) && IsNAN(test[i].root1))) && ans.status == test[i].status ))
+        if (Comparison_of_roots(ans.root1, test[i].root1) && 
+            Comparison_of_roots(ans.root2, test[i].root2) &&
+            ans.status == test[i].status )
             printf("    ...Correct\n\n");
         else
             printf("    ...Mistake\n\n");    
@@ -228,5 +303,6 @@ void unit_test()
 }
 
 //TODO: const ...  done 
-//TODO: NAMES!!  +-
+//TODO: NAMES!!  done
 //TODO: Prototipes  done
+//TODO: Clean output done
