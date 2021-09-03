@@ -16,7 +16,7 @@ int puts(const char *string)
 
 char * strchr( const char *string, int symbol)
 {
-    char *x;
+    char x = ' ';
 
     if ( *string == '\0' )
         return NULL;
@@ -24,8 +24,8 @@ char * strchr( const char *string, int symbol)
     {
         if ( *string == symbol )
         {
-            *x = *string;
-            return x;
+            x = *string;
+            return &x;
         }
         string++;
     }    
@@ -42,6 +42,6 @@ int main()
         printf("Good\n");
     else
         printf("(\n");
-   // printf("%s", x);        
+    printf("%c", *x);        
     return 0;
 }
