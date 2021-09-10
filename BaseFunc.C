@@ -4,14 +4,14 @@
 int puts(const char *string)
 {
     int i = 0;
+    char ch = '\0';
 
     if ( string == NULL )
         return 0;
     
-    while ( *string != '\0')
+    while ( ch = string[i]/*) != '\0'*/)
     {
-        putchar(*string);
-        string++;
+        putchar(ch);
         i++;
     }
 
@@ -45,25 +45,23 @@ int strlen( const char* str )
     char currSymbol = '\0';
     int len = 0;
 
-    while ( currSymbol = *str )
-    {
-        len++;
-        str++;    
-    }
+    while ( currSymbol = str[len] )
+        len++;    
 
     return len;
 }
 
 char *strcpy( char *dest, const char *str )
 {
+    int i = 0;
+
     if ( str == NULL )
         return NULL;
 
-    while ( *str != '\0')
+    while ( str[i] != '\0')
     {
-        *dest = *str;
-        str++;
-        dest++;
+        dest[i] = str[i];
+        i++;
     }
 
     return dest;
@@ -73,17 +71,15 @@ char *strncpy( char *dest, const char *str, size_t count )
 {
     int i = 0;
 
-    if ( count < 0 )
-        return NULL;
-
     if ( str == NULL )
         return NULL;
 
-    while ( *str != '\0' && count > i)
+    if ( dest == NULL )
+        return NULL;
+
+    while ( str[i] != '\0' && count > i)
     {
-        *dest = *str;
-        str++;
-        dest++;
+        dest[i] = str[i];
         i++;
     }
 
@@ -92,20 +88,25 @@ char *strncpy( char *dest, const char *str, size_t count )
 
 char *strcat( char *dest, const char *str )
 {
+    int i = 0, size = strlen(dest);
+
     if ( dest == NULL )
         return NULL;
 
     if ( str == NULL ) 
         return NULL; 
 
-    while ( *dest != '\0' )
-        dest++;
-
-    while ( *str != '\0')
+    while ( size > i )
     {
-        *dest = *str;
-        str++;
-        dest++;
+        dest[i] = '\0';
+        i++;
+    }
+
+    i = 0;
+    while ( str[i] != '\0')
+    {
+        dest[i] = str[i];
+        i++;
     }
 
     return dest;
@@ -113,10 +114,7 @@ char *strcat( char *dest, const char *str )
 
 char * strncat( char * dest, const char * str, size_t num )
 {
-    int i = 0;
-
-    if ( num < 0 )
-        return NULL;
+    int i = 0, size = strlen(dest);
 
     if ( dest == NULL )
         return NULL;
@@ -124,14 +122,16 @@ char * strncat( char * dest, const char * str, size_t num )
     if ( str == NULL ) 
         return NULL; 
 
-    while ( *dest != '\0' )
-        dest++;
+    while ( size > i )
+    {
+        dest[i] = '\0';
+        i++;
+    }
 
+    i = 0;
     while ( *str != '\0' && i < num)
     {
-        *dest = *str;
-        str++;
-        dest++;
+        dest[i] = str[i];
         i++; 
     }
 
@@ -152,9 +152,12 @@ char * fgets( char * string, int num, FILE * filestream )
     if (filestream == NULL)
          return NULL;
 
-    fread(str, sizeof(char), buffer_size , filestream);
-
     i = 0;
+    while ( (str[i] = fgetc(filestream)) != EOF)
+        i++;
+    str[i - 1] = '\0';
+    i = 0;
+
     while (str[i] != '\0' && num > i)
     {
         *string = str[i];
@@ -174,8 +177,9 @@ char * strdup( const char *str1 )
     if ( str1 == NULL )
         return NULL;
 
-    for (i = 0; i < buffer_size; i++)
-        i [str] = NULL; // *(str + i) = *(i + str) = i [str];
+   /* for (i = 0; i < buffer_size; i++)
+        i [str] = NULL; // *(str + i) = *(i + str) = i [str];*/
+    //не нужно, т к calloc освобождает память
 
     strncpy(str, str1, buffer_size);
 
@@ -194,24 +198,17 @@ int main()
     for (i = 0; i < 100; i++)
         str[i] = NULL;
  
-     //FILE *f = NULL;
-    // char name[] = "FILE.txt";
-  //   f = fopen(name, "r");
+     FILE *f = NULL;
+     char name[] = "FILE.txt";
+     f = fopen(name, "r");
 
-     
-//    fgets(str, 20, f);
+    printf("%i \n", strlen(s));
+    //puts(strchr(s, 'o')); 
+    fgets(str, 20, f);
 
-    //strcpy(str, "Hahahahahah");     
-    //puts(str);
-    //strncat(str, s, 6);
+    strncpy(str, "Hahahahahah", 80);
+    strncat(str, s, 10);     
+    puts(str);
     puts(strdup(s));
     return 0;
 }
-
-//x = strchr(s, 'e');
-    //if (strchr(s, 'e'))
-    //    printf("Good\n");
-    //else
-    //    printf("(\n");
-    //printf("%c\n", *x);
-    //printf("%i \n", strlen(s)); 
